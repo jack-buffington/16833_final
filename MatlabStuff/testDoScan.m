@@ -15,7 +15,11 @@ map = [-3,4,3,4;...
        0,-3.5,-3,-4;...
        -3,-4, -3,4];
 
+figure(1)
+clf
+axis equal
     
+ 
 % plot out the line segments in the actual orientation
 for I = 1:size(map,1)
    x = [map(I,1); map(I,3)];
@@ -24,9 +28,7 @@ for I = 1:size(map,1)
    hold on
 end
 
-figure(1)
-clf
-axis equal
+
 
 % This is the actual scan
 ranges1 = doScan(robotPosition,robotAngle,numberOfRays,noiseMagnitude,map);
@@ -43,6 +45,7 @@ end
 % Plot the ranges as the robot sees things.
 plot(scan1(:,1),scan1(:,2),'.');
 axis equal
+
 plot(robotPosition(1),robotPosition(2),'*r');
 
 
