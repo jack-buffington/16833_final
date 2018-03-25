@@ -23,5 +23,5 @@ def loadData(path):
             data.append(scan); 
     return data
 
-data = loadData("scanData.txt"); 
+
             

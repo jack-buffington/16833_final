@@ -1,0 +1,8 @@
+1 Find the centroid of both input sets and shift them both to zero - remember these offsets
+2 Find the closest point in the old scan to each point in the new scan 
+3 Create a matrix of the old points that match up with the new points
+4 Find the covariance of these two sets of points
+5 Use SVD to find the rotation between them
+6 Find the translation as center of mass (centroid) for set 1 - rotation * center of mass for set 2.
+
+Repeat all steps 
