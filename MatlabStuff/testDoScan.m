@@ -1,8 +1,8 @@
 
 
-numberOfRays = 400;
-robotPosition = [0,0]; % in meters
-robotAngle = 0; % in radians
+numberOfRays = 260;
+robotPosition = [2,.3]; % in meters
+robotAngle = 0.03; % in radians
 noiseMagnitude = .01; % Could have UP TO this amount in meters added to each range
                       % measurement
 
@@ -17,7 +17,8 @@ map = [-3,4,3,4;...
 
 figure(1)
 clf
-axis equal
+subplot(1,2,1);
+
     
  
 % plot out the line segments in the actual orientation
@@ -28,7 +29,8 @@ for I = 1:size(map,1)
    hold on
 end
 
-
+plot(robotPosition(1),robotPosition(2),'*r');
+axis equal
 
 % This is the actual scan
 ranges1 = doScan(robotPosition,robotAngle,numberOfRays,noiseMagnitude,map);
@@ -43,11 +45,15 @@ end
 
 
 % Plot the ranges as the robot sees things.
-plot(scan1(:,1),scan1(:,2),'.');
+subplot(1,2,2)
+plot(scan1(:,1),scan1(:,2),'b.');
+hold on
+plot(0,0,'*b');
 axis equal
 
-plot(robotPosition(1),robotPosition(2),'*r');
 
+
+plot(0,0,'*b');
 
 
 
