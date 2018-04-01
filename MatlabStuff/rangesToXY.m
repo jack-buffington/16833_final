@@ -4,6 +4,6 @@ function XY = rangesToXY(ranges)
    XY = zeros(numberOfRays,2);
    for I = 1:numberOfRays
       angle = 2*pi*(I/numberOfRays);
-      XY(I,:) = [ranges1(I)*cos(angle), ranges1(I)*sin(angle)];
+      XY(I,:) = [ranges(I)*cos(angle), ranges(I)*sin(angle)];
    end
 end

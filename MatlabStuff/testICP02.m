@@ -21,31 +21,30 @@ robotAngle = 0.03; % in radians
 ranges1 = doScan(robotPosition,robotAngle,numberOfRays,noiseMagnitude,map);
 XY1 = rangesToXY(ranges1);
 
-robotPosition = [1.5,.22]; % in meters
-robotAngle = 0.08; % in radians
+robotPosition = [2.3,.22]; % in meters
+robotAngle = 0.15; % in radians
 
 ranges2 = doScan(robotPosition,robotAngle,numberOfRays,noiseMagnitude,map);
 XY2 = rangesToXY(ranges2);
 
-% Perform ICP on the data to find the optimal alignment.
-[rotationMatrix, translation] = ICP01(XY1, XY2);
+% % Perform ICP on the data to find the optimal alignment.
+% [rotationMatrix, translation] = ICP02(XY1, XY2);
+% 
+% 
+% % Apply the rotation and translation that was found.
+% % rotation first
+% XY3 = (rotationMatrix * XY2')';
+% XY3 = XY3 + translation;
+% 
 
 
-% Apply the rotation and translation that was found.
-% rotation first
-XY3 = (rotationMatrix * XY2')';
-XY3 = XY3 + translation';
+% repeat a few more times for good measure
+XY4 = XY2;
 
-
-
-% repeat a few times for good measure
-XY4 = XY3;
-
-for I = 1:15  % 15 seems to be about what is necessary.  Below that I can see visible
-              % angle difference
-   [rotationMatrix, translation] = ICP01(XY1, XY4);
+for I = 1:10
+   [rotationMatrix, translation] = ICP02(XY1, XY4);
    XY4 = (rotationMatrix * XY4')';
-   XY4 = XY4 + translation';
+   XY4 = XY4 + translation;
 end
 
 
@@ -55,8 +54,8 @@ clf
 plot(XY1(:,1),XY1(:,2),'.r');
 hold on
 plot(XY2(:,1),XY2(:,2),'.g');
-plot(XY3(:,1),XY3(:,2),'.b');
-plot(XY4(:,1),XY4(:,2),'+k');
+plot(XY4(:,1),XY4(:,2),'.b');
+%plot(XY4(:,1),XY4(:,2),'+k');
 
 axis equal
 
