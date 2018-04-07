@@ -4,8 +4,9 @@ from occupancyMap import *
 import time
 
 data = loadData('scanData.txt')
+occupancyMap = initMap(); 
 for i in data:
     scan = convertScanToXY(i);
-    visualizeScan(scan, True);
+    occupancyMap = insertPoints(scan, occupancyMap);
+    visualizeMap(occupancyMap); 
     time.sleep(0.1);
-    print i
