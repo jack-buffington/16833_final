@@ -3,6 +3,7 @@ from convertScanToXY import *
 from occupancyMap import *
 import time
 import numpy as np
+import pdb
 
 data = loadData('scanData.txt')
 occupancyMap = initMap(); 
