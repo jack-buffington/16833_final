@@ -14,6 +14,39 @@ def convertWorldFrameToMap(points, occupancyMap):
     points = points.astype('int'); 
     return points;
 
+def convertMapToWorldFrame(points, occupancyMap):
+    offset = len(occupancyMap)/2;
+    points = (points) - offset;
+    return points;
+
+def getPointsWithinRadius(occupancyMap, robotPose, radius):
+    #radius in centimetres.
+    #robot pose in world Coordinates
+    mapSize = len(occupancyMap);
+    offset = mapSize/2; 
+    robotX = robotPose[0]+offset;
+    robotY = robotPose[1]+offset;
+    
+    xMin =  robotX - radius;
+    if (xMin < 0):
+        xMin = 0;
+        
+    xMax = robotX + radius;
+    if (xMax >= mapSize):
+        xMax = mapSize;
+        
+    yMin = robotY - radius;
+    if (yMin < 0):
+        yMin = 0;
+        
+    yMax = robotY + radius;
+    if (yMax >= mapSize):
+        yMax = mapSize;
+
+    mapSection = occupancyMap[xMin:xMax, yMin:yMax];
+    mapSection = convertMapToWorldFrame(mapSection, occupancyMap); 
+    return mapSection; 
+    
 def insertPoints(pointsWorldFrame, occupancyMap):
     #points -> 2d array of points in world frame 
     pointsMap = convertWorldFrameToMap(pointsWorldFrame, occupancyMap);
@@ -21,6 +54,7 @@ def insertPoints(pointsWorldFrame, occupancyMap):
     return occupancyMap;
 
 def visualizeMap(occupancyMap, robotPos):
+    #robot pose in world coordinates 
     fig = plt.figure(1);
     ax = fig.add_subplot(111);
     offset = len(occupancyMap)/2;
