@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-
+from PIL import Image
 
 
 def initMap():
@@ -20,12 +20,18 @@ def insertPoints(pointsWorldFrame, occupancyMap):
     occupancyMap[pointsMap[:,0], pointsMap[:,1]] = 1;
     return occupancyMap;
 
-def visualizeMap(occupancyMap):
+def visualizeMap(occupancyMap, robotPos):
     fig = plt.figure(1);
     ax = fig.add_subplot(111);
-    ax.imshow(occupancyMap, cmap='Greys');
-    fig.canvas.draw()
-    plt.show(block=False)
+    offset = len(occupancyMap)/2;
+    occMapXY = np.asarray(zip(*np.where(occupancyMap==1)));
+    ax.scatter(occMapXY[:,0], occMapXY[:,1], c='b', marker='.'); 
+    ax.scatter(robotPos[0]+offset, robotPos[1]+offset, c='r', marker='8'); 
+    plt.xlim(0,10000);
+    plt.ylim(0,10000);
+    plt.axis('equal'); 
+    fig.canvas.draw();
+    plt.show(block=False);
 
 def visualizeScan(points, clearFlag):
     fig = plt.figure(1);
