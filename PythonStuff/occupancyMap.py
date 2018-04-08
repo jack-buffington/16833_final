@@ -57,7 +57,7 @@ def getPointsWithinRadius(occupancyMap, robotPose, radius):
 
 
 def reInsertPoints(pointsWorldFrame, occupancyMap):
-    print 'reinserting points \n'
+    #print 'reinserting points \n'
     #points -> 2d array of points in world frame 
     pointsMap = convertWorldFrameToMap(pointsWorldFrame, occupancyMap);
     if(len(pointsMap) > 0):
@@ -65,7 +65,7 @@ def reInsertPoints(pointsWorldFrame, occupancyMap):
     return occupancyMap;
 
 def expandMap(occupancyMap):
-    print 'expanding map \n'
+    #print 'expanding map \n'
     mapSize = len(occupancyMap);
     occupiedPoints = np.asarray(zip(*np.where(occupancyMap==1)));
     occupiedPointsWorldFrame = convertMapToWorldFrame(occupiedPoints, occupancyMap);
