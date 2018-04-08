@@ -6,7 +6,7 @@ import pdb
 
 def initMap():
     #scale 1 unit = 1cm = 0.01m 
-    occupancyMap = np.zeros([10,10]); 
+    occupancyMap = np.zeros([10000,10000]); 
     return occupancyMap;
 
 
@@ -107,7 +107,7 @@ def visualizeMap(occupancyMap, robotPos):
     ax.scatter(robotPos[0]+offset, robotPos[1]+offset, c='r', marker='8'); 
     plt.xlim(0,10000);
     plt.ylim(0,10000);
-    plt.axis('equal'); 
+    #plt.axis('equal'); 
     fig.canvas.draw();
     plt.show(block=False);
 
