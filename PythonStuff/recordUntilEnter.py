@@ -34,8 +34,7 @@ def update_line(num, iterator, line):
 def run():
 
     count = 1
-    print '\n\n\nThis program will terminate when you hit enter'
-    # time.sleep(1.5)
+    
 
     a_list = []
     thread.start_new_thread(input_thread, (a_list,))
@@ -48,6 +47,11 @@ def run():
     foundFirstNewScan = False
 
     data = []
+
+
+    print '\n\n\nThis program will terminate when you hit enter'
+    print 'Starting up'
+
 
     for I in iterator:
 

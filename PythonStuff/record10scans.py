@@ -38,13 +38,15 @@ def run():
             if foundFirstNewScan == False:
                 foundFirstNewScan = True
                 print 'First scan'
-            else:
+                
+            else:  # It found the beginning of a new scan
                 data.append(temp)
                 currentList += 1
                 print 'Current scan: ', currentList
                 if currentList == 10:
                     break
             temp = [] # This is the array that will hold a scan
+
 
         if foundFirstNewScan == True:
             temp.append([I[2], I[3]])
