@@ -10,20 +10,15 @@ def distance(x1,y1,x2,y2):
     dist=math.sqrt(((float(x1)-float(x2))*(float(x1)-float(x2)))+((float(y1)-float(y2))*(float(y1)-float(y2))))
     return dist
 
-def ClosestPoints(old,new):
-    
-    closest=[]
-    for i in range(len(new)):
-        index=0
-        min_dist=238900
-        for j in range(len(old)):
-            dist=distance(new[i][0],new[i][1],old[j][0],old[j][1])
-            if dist<min_dist:
-                min_dist=dist
-                index=j
-        closest.append([old[index][0],old[index][1]])
 
-    return np.array(closest)
+
+def closestPoints(old,new):
+    distances = cdist(old,new,'euclidean')
+    # distances is a matrix where rows correspond to points in the 'old' matrix and 
+    # cols correspond to points in the 'new' matrix.
+    indices = np.argmin(distances, axis = 0)
+    closest = old[indices] # gives me 
+    return closest
 
 
 
@@ -31,10 +26,10 @@ def ClosestPoints(old,new):
 def doOneIteration(XY1,XY2):
 
 #   Find the closest point in XY2 for each point in XY1
-    closestPoints=ClosestPoints(XY1,XY2)
-    
+    closestPts=closestPoints(XY1,XY2)
+
 #   Find the covariance between the 2 matrices
-    cov=np.matmul((np.transpose(XY2)),closestPoints)
+    cov=np.matmul((np.transpose(XY2)),closestPts)
     #pdb.set_trace()
     
 #   Use that to find the rotation
@@ -45,12 +40,13 @@ def doOneIteration(XY1,XY2):
     XY2 = np.matmul(rotationMatrix,XY2.T).T
 
 #   Find their average translation from their corresponding closest points
-    diffs=XY2-closestPoints
+    diffs=XY2-closestPts
     offset=np.mean(diffs,axis=0)
     translation=-offset
     
 #   Calculate the error in alignment as the sum of squared distances between point matches
     err=math.sqrt((offset[0])*(offset[0])+(offset[1])*(offset[1]))
+
     return rotationMatrix, translation, err
 
 
@@ -61,9 +57,6 @@ def ICP2(XY1, XY2):
     # XY2 = convertScanToXY(XY2)
     start_time = time.time()
 
-
-    print 'Shape of XY1 before interpolation:'
-    print XY1.shape
     #########################################
     # Interpolate the first scan as necessary
     #########################################
@@ -96,15 +89,12 @@ def ICP2(XY1, XY2):
         XY1 = interpolatePoints(A,B, distance, maxDist, XY1)
 
     elapsed_time = time.time() - start_time
-    print 'Time to interpolate: ', elapsed_time
-    print 'Shape of XY1 after interpolation:'
-    print XY1.shape
+
 
 
     ######################################
     # Iterate the closest points algorithm
     ######################################
-    start_time = time.time()
     totalTranslation = np.matrix('0 0')
     totalRotationMatrix = np.matrix('1 0; 0 1');
     maxIterations = 30; # takes about .043 seconds per iteration
@@ -124,6 +114,7 @@ def ICP2(XY1, XY2):
 
     rotationMatrix = totalRotationMatrix;
     translation = totalTranslation;
+    
     elapsed_time = time.time() - start_time
     print 'Time to do ICP: ', elapsed_time
 
