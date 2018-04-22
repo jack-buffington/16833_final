@@ -105,8 +105,6 @@ def ICP2(XY1, XY2):
 
     for I in range (1,maxIterations):
         rotationMatrix, translation, err = doOneIteration(XY1,XY2)
-        print 'RotationMatrix: '
-        print rotationMatrix
 
         if err < errorThreshold:
             break
