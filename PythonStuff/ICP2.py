@@ -61,12 +61,18 @@ def ICP2(XY1, XY2):
     # XY2 = convertScanToXY(XY2)
     start_time = time.time()
 
+
+    print 'Shape of XY1 before interpolation:'
+    print XY1.shape
     #########################################
     # Interpolate the first scan as necessary
     #########################################
+    # This is approximating point to plane ICP but instead of projecting onto the 
+    # normal, I am just creating more points in areas where things are sparse. 
     numberOfPoints = XY1.shape[0]
     C = np.zeros([2,2]) 
-    maxDist = .07
+    #maxDist = .07
+    maxDist = 50
 
     for I in range(numberOfPoints - 2): 
         A = XY1[I,:]
@@ -91,7 +97,8 @@ def ICP2(XY1, XY2):
 
     elapsed_time = time.time() - start_time
     print 'Time to interpolate: ', elapsed_time
-
+    print 'Shape of XY1 after interpolation:'
+    print XY1.shape
 
 
     ######################################
@@ -129,12 +136,10 @@ def ICP2(XY1, XY2):
 def interpolatePoints(A,B, distance, maxDistance, pointArray):
     numberOfInterpolatedPoints = int(distance / maxDistance)
     offset = (B - A)/float(numberOfInterpolatedPoints + 1)
-
     currentLocation = A
     for J in range(numberOfInterpolatedPoints):
         currentLocation += offset
-        np.append(pointArray,np.array([currentLocation]), axis = 0)
-
+        pointArray = np.append(pointArray,[currentLocation], axis = 0)
     return pointArray
 
 
