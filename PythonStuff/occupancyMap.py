@@ -6,7 +6,7 @@ import pdb
 
 def initMap():
     #scale 1 unit = 1cm = 0.01m 
-    occupancyMap = np.zeros([10000,10000]); 
+    occupancyMap = np.zeros([100,100]); 
     return occupancyMap;
 
 
@@ -71,6 +71,7 @@ def expandMap(occupancyMap):
     occupiedPointsWorldFrame = convertMapToWorldFrame(occupiedPoints, occupancyMap);
         
     newMapSize = 5*mapSize;
+    print newMapSize
     newOccupancyMap = np.zeros([newMapSize, newMapSize]);
     newOccupancyMap = reInsertPoints(occupiedPointsWorldFrame, newOccupancyMap);
     return newOccupancyMap;
@@ -87,13 +88,13 @@ def withinMap(points, occupancyMap):
     
 def insertPoints(pointsWorldFrame, occupancyMap):
     #points -> 2d array of points in world frame 
-    pointsMap = convertWorldFrameToMap(pointsWorldFrame, occupancyMap);
+    pointsMapFrame = convertWorldFrameToMap(pointsWorldFrame, occupancyMap);
     
-    while(withinMap(pointsMap, occupancyMap) == False):
+    while(withinMap(pointsMapFrame, occupancyMap) == False):
         occupancyMap = expandMap(occupancyMap);
-        pointsMap = convertWorldFrameToMap(pointsWorldFrame, occupancyMap);
+        pointsMapFrame = convertWorldFrameToMap(pointsWorldFrame, occupancyMap);
     
-    occupancyMap[pointsMap[:,0], pointsMap[:,1]] = 1;
+    occupancyMap[pointsMapFrame[:,0], pointsMapFrame[:,1]] = 1;
     return occupancyMap;
 
 def visualizeMap(occupancyMap, robotPos):
@@ -103,10 +104,10 @@ def visualizeMap(occupancyMap, robotPos):
     offset = len(occupancyMap)/2;
     #find where in the occupancyMap is filled, return as an (x,y) 2D array 
     occMapXY = np.asarray(zip(*np.where(occupancyMap==1)));
-    ax.scatter(occMapXY[:,0], occMapXY[:,1], c='b', marker='.'); 
-    ax.scatter(robotPos[0]+offset, robotPos[1]+offset, c='r', marker='8'); 
-    plt.xlim(0,10000);
-    plt.ylim(0,10000);
+    ax.scatter(occMapXY[:,0], occMapXY[:,1], c='b', marker='.',s=10); 
+    ax.scatter(robotPos[0]+offset, robotPos[1]+offset, c='r', marker='8');
+    plt.xlim(0,len(occupancyMap));
+    plt.ylim(0,len(occupancyMap));
     #plt.axis('equal'); 
     fig.canvas.draw();
     plt.show(block=False);
@@ -120,6 +121,7 @@ def visualizeScan(points, clearFlag):
     y = points[:,1]; 
     ax.scatter(x,y);
     plt.axis('equal');
-    fig.canvas.draw(); 
+    fig.canvas.draw();
+    fig.canvas.flush_events(); 
     plt.show(block=False);
 
