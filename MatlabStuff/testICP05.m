@@ -71,6 +71,8 @@ noiseMagnitude = .05;
 
 ranges1 = doScan(robotPosition,robotAngle,numberOfRays,noiseMagnitude,map);
 XY1 = rangesToXY(ranges1);
+
+
 % Get rid of max range values
 rangesToUse = ranges1 < 8;
 XY1 = XY1(rangesToUse == 1,:);
@@ -108,6 +110,7 @@ robotAngle = robotAngle + offsetAngle2;
 noiseMagnitude = .05; 
 ranges3 = doScan(robotPosition,robotAngle,numberOfRays,noiseMagnitude,map);
 XY3 = rangesToXY(ranges3);
+
 rangesToUse = ranges3 < 8;
 XY3 = XY3(rangesToUse == 1,:);
 
@@ -150,45 +153,20 @@ disp(rotAngle)
 
 
 
-% Notes:  
-% If I translate then rotate the XY2 points, then XY2 and XY3 (G, B)
-% align perfectly with each other.  
+cumulativeTransform = [rotationMatrix translation'; [0 0 1]]; 
 
-% If I rotate then translate then XY1 and XY2 (R,G) align perfectly.
+% transform the 2nd set of points now
+XY2temp = [XY2 ones(size(XY2,1),1)]; 
+XY2temp = (cumulativeTransform * XY2temp')';
+XY2 = XY2temp(:,1:2);
 
+% update the cumulative transformation matrix
+tempTransform = [rotationMatrix2 translation2'; [0 0 1]]; 
+cumulativeTransform = cumulativeTransform * tempTransform;
 
-
-% Apply the transformations
-% Make XY1 and XY2 align (R,G)
-XY2 = (rotationMatrix * XY2')';
-%XY2 = XY2 * rotationMatrix; % Didn't work
-XY2 = XY2 + translation;
-
-
-% % find a running transform.  
-% cumulativeRotation = rotationMatrix;
-% cumulativeTranslation = translation;
-% 
-% cumulativeTranslation = (rotationMatrix2 * cumulativeTranslation')';
-% cumulativeRotation = rotationMatrix2 * cumulativeRotation;
-% 
-% 
-% XY3 = (cumulativeRotation * XY3')';
-% XY3 = XY3 + cumulativeTranslation;
-
-
-
-% ############################################
-% This works but would be slow in the long run
-% ############################################
-% Make XY3 align with XY2
-XY3 = (rotationMatrix2 * XY3')';
-XY3 = XY3 + translation2;
-
-% Now make XY3 align with XY1
-XY3 = (rotationMatrix * XY3')';
-XY3 = XY3 + translation;
-
+XY3temp = [XY3 ones(size(XY3,1),1)]; 
+XY3temp = (cumulativeTransform * XY3temp')';
+XY3 = XY3temp(:,1:2);
 
 
 
