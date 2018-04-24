@@ -44,6 +44,8 @@ function [rotationMatrix, translation] = ICP04(XY1, XY2)
    end
    
    
+   originalXY2 = XY2;
+
    
    % ###############
    % Do the ICP part
@@ -73,10 +75,12 @@ function [rotationMatrix, translation] = ICP04(XY1, XY2)
 
    rotationMatrix = totalRotationMatrix;
    translation = totalTranslation;
-   
 
 
 end
+
+
+
 
 
 function [rotationMatrix, translation,err] = doOneIteration(XY1,XY2)
@@ -99,8 +103,7 @@ function [rotationMatrix, translation,err] = doOneIteration(XY1,XY2)
    [U, ~, V] = svd(cov);
    rotationMatrix = V*U';
    
-   % Find the optimal translation
-   % Rotate the points
+   % Find the optimal translation 
    XY2 = (rotationMatrix * XY2')';
    % Find their average translation from their corresponding closest points
    difs = XY2 - closestPoints;
