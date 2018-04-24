@@ -21,6 +21,12 @@ offsetAngle = .1;
 offsetPosition2 = [1 -.2];
 offsetAngle2 = -.3;
 
+useMaximumRange = 1;
+useMovingObject = 1;
+
+noiseMagnitude = 00;
+movingObjectHeight = .75;
+movingObjectTop = 7;
 
 
 % Create the map to be scanned.  Each row is [x y x y] and represents a line
@@ -51,7 +57,12 @@ map = [0,0,0,8;...      % 1
        9,10,11,10;...   % 17
        11,10,11,8;...   % 18
        9,8,11,8];       % 19
-   
+    
+if useMovingObject == 1
+   map = [map;...
+          5,movingObjectTop,5,movingObjectTop-movingObjectHeight];        % 20 - extra 'wall' to simulate a moving object
+end
+    
 % Draw the map
 figure(3)
 clf
@@ -67,15 +78,17 @@ plot(initialPosition(1),initialPosition(2),'g*');
 numberOfRays = 260;
 robotPosition = initialPosition; 
 robotAngle = initialAngle; 
-noiseMagnitude = .05;
+
 
 ranges1 = doScan(robotPosition,robotAngle,numberOfRays,noiseMagnitude,map);
 XY1 = rangesToXY(ranges1);
 
 
 % Get rid of max range values
-rangesToUse = ranges1 < 8;
-XY1 = XY1(rangesToUse == 1,:);
+if useMaximumRange == 0
+   rangesToUse = ranges1 < 8;
+   XY1 = XY1(rangesToUse == 1,:);
+end
 
 plot(XY1(:,1)+initialPosition(1), XY1(:,2)+ initialPosition(2),'g.')
 
@@ -90,30 +103,41 @@ XY1B =XY1;
 
 
 % Second scan
+if useMovingObject == 1
+   map(20,:) = [7,movingObjectTop,7,movingObjectTop - movingObjectHeight];  % move the 'moving' object
+end
+   
 numberOfRays = 260;
 robotPosition = initialPosition + offsetPosition;
 robotAngle = initialAngle + offsetAngle;
-noiseMagnitude = .05; 
+
 
 ranges2 = doScan(robotPosition,robotAngle,numberOfRays,noiseMagnitude,map);
 XY2 = rangesToXY(ranges2);
 
-rangesToUse = ranges2 < 8;
-XY2 = XY2(rangesToUse == 1,:);
-
+if useMaximumRange == 0
+   rangesToUse = ranges2 < 8;
+   XY2 = XY2(rangesToUse == 1,:);
+end
 
 
 % Third scan
+if useMovingObject == 1
+   map(20,:) = [8,movingObjectTop,8,movingObjectTop - movingObjectHeight];  % move the 'moving' object
+end
+
 numberOfRays = 260;
 robotPosition = robotPosition + offsetPosition2;
 robotAngle = robotAngle + offsetAngle2;
-noiseMagnitude = .05; 
+
+
 ranges3 = doScan(robotPosition,robotAngle,numberOfRays,noiseMagnitude,map);
 XY3 = rangesToXY(ranges3);
 
-rangesToUse = ranges3 < 8;
-XY3 = XY3(rangesToUse == 1,:);
-
+if useMaximumRange == 0
+   rangesToUse = ranges3 < 8;
+   XY3 = XY3(rangesToUse == 1,:);
+end
 
 
 
@@ -175,7 +199,7 @@ XY3 = XY3temp(:,1:2);
 % Plot things out and see how it did.
 figure(1);
 clf
-plot(XY1B(:,1),XY1B(:,2),'+r');
+plot(XY1B(:,1),XY1B(:,2),'.r');
 hold on
 plot(XY2(:,1),XY2(:,2),'.g');
 plot(XY3(:,1),XY3(:,2),'.b');
