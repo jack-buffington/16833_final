@@ -1,7 +1,11 @@
-function [rotationMatrix, translation] = ICP04(XY1, XY2)
+function [rotationMatrix, translation] = ICP05(XY1, XY2)
    % This version interpolates the first point set to make matching more accurate.
    % Additionally, it is the first version that actually implements the full ICP
    % algorithm.
+   
+   % This is the same as ICP04 except that it attempts to refine the solution once it
+   % has run ICP once.  It does this by removing points from the solution that are
+   % greater than 1.5 times maxDist from their nearest point.  
    
    
    % Interpolate between points in the first scan
@@ -44,16 +48,62 @@ function [rotationMatrix, translation] = ICP04(XY1, XY2)
    end
    
    
-   originalXY2 = XY2;
+
 
    
    % ###############
    % Do the ICP part
    % ###############
-   totalTranslation = [0,0];
+   
+   [rotationMatrix, translation] = actualICP(XY1, XY2);
+   
+   % rotate and translate the XY2 points
+   XY2temp = (rotationMatrix * XY2')';
+   XY2temp = XY2temp + translation;
+   
+   
+   % #########################################
+   % Remove points that don't align very well:
+   % #########################################
+   
+   
+   % * Find the distances to all of the closest points again
+   distances = pdist2(XY1, XY2temp);  %XY2 is the moved set of points
+   [minDistances, ~] = min(distances);
+   
+   % * Figure out if there are any points that don't sit close to any points in the old
+   %     To find points that are outliers, look for points that are more than 1.5 times
+   %     the maxDist 
+   pointsToKeep = minDistances < maxDist * 1.5; % 1's and 0's
+   count  = 1:size(pointsToKeep,2);
+   pointsToKeep = pointsToKeep .* count;
+   pointsToKeep = pointsToKeep(pointsToKeep > 0);
+   
+   % and temporarily remove them from the new set.
+   XY2refined = XY2(pointsToKeep,:);
+   
+   A = 0;
+
+   
+   % ##############################################################
+   % Do ICP again with the two sets of points that match up better.
+   % ##############################################################
+   
+   [rotationMatrix, translation] = actualICP(XY1, XY2refined);
+   
+
+   
+
+
+end
+
+
+
+
+function [rotationMatrix, translation] = actualICP(XY1, XY2)
+totalTranslation = [0,0];
    totalRotationMatrix = eye(2);
    maxIterations = 50;
-   %errorThreshold = .00008; % This value seems to be good enough.
    errorThreshold = .00001; % This value seems to be good enough.
 
    
@@ -75,9 +125,8 @@ function [rotationMatrix, translation] = ICP04(XY1, XY2)
 
    rotationMatrix = totalRotationMatrix;
    translation = totalTranslation;
-
-
 end
+
 
 
 
