@@ -91,7 +91,7 @@ function ranges = doScan(robotPosition, robotAngle, numberOfRays, noiseMagnitude
 
 
       end % Of going through all of the line segments looking for the nearest intersection
-      fprintf ('Angle: %.01f\t\tline segment: %d\n',angleDegrees,closestSegment);
+      %fprintf ('Angle: %.01f\t\tline segment: %d\n',angleDegrees,closestSegment);
       
       % take this distance and add a small amount of noise to it
       closestIntersection = closestIntersection + ((rand(1)-.5) * noiseMagnitude); 

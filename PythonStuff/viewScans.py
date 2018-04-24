@@ -7,11 +7,14 @@ from convertScanToXY import convertScanToXY
 
 
 data = loadData('firstFloor.txt')
+frameNumber = 0;
 for i in data:
     scan = convertScanToXY(i);
     visualizeScan(scan, True);
-    time.sleep(0.03);
-    print i
+    time.sleep(0.01);
+    print frameNumber
+    frameNumber += 1;
+    #print i
 
 # oldScan = data[0]
 # newScan = data[0]
