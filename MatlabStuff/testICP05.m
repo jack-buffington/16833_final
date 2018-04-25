@@ -64,14 +64,14 @@ if useMovingObject == 1
 end
     
 % Draw the map
-figure(3)
-clf
-for I = 1:size(map,1)
-   plot([map(I,1); map(I,3)],[map(I,2); map(I,4)], 'r');
-   hold on
-end
-axis equal
-plot(initialPosition(1),initialPosition(2),'g*');
+% figure(3)
+% clf
+% for I = 1:size(map,1)
+%    plot([map(I,1); map(I,3)],[map(I,2); map(I,4)], 'r');
+%    hold on
+% end
+% axis equal
+% plot(initialPosition(1),initialPosition(2),'g*');
     
     
 % First scan
@@ -90,7 +90,7 @@ if useMaximumRange == 0
    XY1 = XY1(rangesToUse == 1,:);
 end
 
-plot(XY1(:,1)+initialPosition(1), XY1(:,2)+ initialPosition(2),'g.')
+% plot(XY1(:,1)+initialPosition(1), XY1(:,2)+ initialPosition(2),'g.')
 
 % ################
 % Quantize the map
@@ -180,16 +180,19 @@ disp(rotAngle)
 cumulativeTransform = [rotationMatrix translation'; [0 0 1]]; 
 
 % transform the 2nd set of points now
-XY2temp = [XY2 ones(size(XY2,1),1)]; 
-XY2temp = (cumulativeTransform * XY2temp')';
+XY2temp = [XY2 ones(size(XY2,1),1)];
+XY2temp = XY2temp * cumulativeTransform';
 XY2 = XY2temp(:,1:2);
+
 
 % update the cumulative transformation matrix
 tempTransform = [rotationMatrix2 translation2'; [0 0 1]]; 
 cumulativeTransform = cumulativeTransform * tempTransform;
 
+
+% transform the third set of points
 XY3temp = [XY3 ones(size(XY3,1),1)]; 
-XY3temp = (cumulativeTransform * XY3temp')';
+XY3temp = XY3temp * cumulativeTransform';
 XY3 = XY3temp(:,1:2);
 
 
