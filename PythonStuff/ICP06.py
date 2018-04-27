@@ -108,8 +108,8 @@ def ICP06(XY1, XY2):
 
 
 
-    print 'Stop point B'
-    pdb.set_trace()
+    # print 'Stop point just before ICP'
+    # pdb.set_trace()
     # ###############
     # Do the ICP part
     # ###############
@@ -167,20 +167,38 @@ def ICP06(XY1, XY2):
 # THIS FUNCTION WAS CHECKED
 def interpolatePoints(A,B, distance, maxDistance, pointArray):
 
-    print pointArray
-    pdb.set_trace()
+    # print pointArray
+    # pdb.set_trace()
     
     numberOfInterpolatedPoints = int(math.floor(distance / maxDistance))
     
     offset = (B - A)/float(numberOfInterpolatedPoints + 1)
 
-    currentLocation = A
+    #currentLocation = A
+    currentLocation = np.array([A[0], A[1]])
     
     for J in range(numberOfInterpolatedPoints):
-        currentLocation += offset # This line is corrupting the first location 
-                                  # of pointArray.
+        currentLocation += offset 
         pointArray = np.append(pointArray,[currentLocation], axis = 0)
     return pointArray
+
+
+# def interpolatePoints2(A,B, distance, maxDistance, pointArray):
+#     numberOfInterpolatedPoints = int(math.floor(distance / maxDistance))
+#     startX = A[0]
+#     endX = B[0]
+#     startY = A[1]
+#     endY = B[1]
+
+#     Xs = np.linspace(startX,endX,numberOfInterpolatedPoints + 2)
+#     Ys = np.linspace(startY,endY,numberOfInterpolatedPoints + 2)
+    
+#     # Concatenate the two 
+#     XYs = np.array([Xs,Ys]).T
+
+#     # Cut off the first and last values
+#     XYs = XYs[1:XYs.shape[0] - 1]
+#     pointArray = 
 
 
 
