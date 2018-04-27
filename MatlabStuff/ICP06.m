@@ -1,4 +1,4 @@
-function [transformMatrix] = ICP06(XY1, XY2)
+function transformMatrix = ICP06(XY1, XY2)
    % This version interpolates the first point set to make matching more accurate.
    % Additionally, it is the first version that actually implements the full ICP
    % algorithm.
@@ -14,22 +14,23 @@ function [transformMatrix] = ICP06(XY1, XY2)
    % Find the distances between successive points.
    numberOfPoints = size(XY1,1);
    
-   maxDist = 50; % millimeters
+   maxDist = 50; % millimeters  % was 50
+   
+   
+   
+   
+   
    
    for I = 1:numberOfPoints - 1
       A = XY1(I,:);
       B = XY1(I+1,:);
       
       distance = pdist([A;B]);
+      
+      fprintf('distance: %f\n',distance);
+
       if distance > maxDist % Create one or more interpolated points between them
-         numberOfInterpolatedPoints = int32(distance / maxDist);
-         offset = (B-A)/double(numberOfInterpolatedPoints + 1);
-        
-         currentLocation = A;
-         for J = 1:numberOfInterpolatedPoints
-            currentLocation = currentLocation + offset;
-            XY1 = [XY1; currentLocation]; 
-         end
+         XY1 = interpolatePoints(A,B,distance, maxDist, XY1);
       end
    end
    
@@ -38,19 +39,17 @@ function [transformMatrix] = ICP06(XY1, XY2)
    B = XY1(1,:);
 
    distance = pdist([A;B]);
-   if distance > maxDist % Create one or more interpolated points between them
-      numberOfInterpolatedPoints = int32(distance / maxDist);
-      offset = (B-A)/double(numberOfInterpolatedPoints + 1);
 
-      currentLocation = A;
-      for J = 1:numberOfInterpolatedPoints
-         currentLocation = currentLocation + offset;
-         XY1 = [XY1; currentLocation]; 
-      end
+   if distance > maxDist % Create one or more interpolated points between them
+      XY1 = interpolatePoints(A,B,distance, maxDist, XY1);
    end
    
    
 
+   
+   
+   
+   
 
    
    % ###############
@@ -60,7 +59,7 @@ function [transformMatrix] = ICP06(XY1, XY2)
    [rotationMatrix, translation] = actualICP(XY1, XY2);
    
    % rotate and translate the XY2 points
-   XY2temp = (rotationMatrix * XY2')';
+   XY2temp = XY2 * rotationMatrix';
    XY2temp = XY2temp + translation;
    
    
@@ -84,7 +83,7 @@ function [transformMatrix] = ICP06(XY1, XY2)
    % and temporarily remove them from the new set.
    XY2refined = XY2(pointsToKeep,:);
    
-   A = 0;
+
 
    
    % ##############################################################
@@ -101,7 +100,7 @@ end
 
 
 function [rotationMatrix, translation] = actualICP(XY1, XY2)
-totalTranslation = [0,0];
+   totalTranslation = [0,0];
    totalRotationMatrix = eye(2);
    maxIterations = 50;
    errorThreshold = .00001; % This value seems to be good enough.
@@ -110,16 +109,15 @@ totalTranslation = [0,0];
    for I = 1:maxIterations
       [rotationMatrix, translation,err] = doOneIteration(XY1,XY2);
       
-      %fprintf('Error for revision %02d = %f\n',I,err);
       if err < errorThreshold
          break;
       end
       
-      XY2 = (rotationMatrix * XY2')';
+      XY2 = XY2 * rotationMatrix';
       XY2 = XY2 + translation;
       
       % Keep track of the total rotation and translation  
-      totalTranslation = (rotationMatrix * totalTranslation')' + translation;
+      totalTranslation = totalTranslation * rotationMatrix' + translation;
       totalRotationMatrix = rotationMatrix * totalRotationMatrix; 
    end
 
@@ -144,7 +142,6 @@ function [rotationMatrix, translation,err] = doOneIteration(XY1,XY2)
    closestPoints = XY1(XY1index,:);
    
    
-   
    % Find covariance between the two matrices
    cov = XY2' * closestPoints;
    
@@ -153,7 +150,8 @@ function [rotationMatrix, translation,err] = doOneIteration(XY1,XY2)
    rotationMatrix = V*U';
    
    % Find the optimal translation 
-   XY2 = (rotationMatrix * XY2')';
+   XY2 = XY2 * rotationMatrix';
+   
    % Find their average translation from their corresponding closest points
    difs = XY2 - closestPoints;
    offset = mean(difs);
@@ -164,4 +162,18 @@ function [rotationMatrix, translation,err] = doOneIteration(XY1,XY2)
    err = sqrt(offset(1)^2 + offset(2)^2);
    
    
+end
+
+
+
+
+function pointArray = interpolatePoints(A,B,distance, maxDist, pointArray)
+   numberOfInterpolatedPoints = int32(floor(distance / maxDist));
+   offset = (B - A)/double(numberOfInterpolatedPoints + 1);
+  
+   currentLocation = A;
+   for J = 1:numberOfInterpolatedPoints
+      currentLocation = currentLocation + offset;
+      pointArray = [pointArray; currentLocation]; 
+   end
 end

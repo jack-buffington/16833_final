@@ -61,6 +61,8 @@ def doOneIteration(XY1,XY2):
 # I'VE CHECKED THIS AS MUCH AS I CAN.
 def ICP06(XY1, XY2):
 
+
+
     #start_time = time.time()
 
     #########################################
@@ -73,7 +75,9 @@ def ICP06(XY1, XY2):
 
     maxDist = 50
 
-    for I in range(numberOfPoints - 2): 
+    
+
+    for I in range(numberOfPoints - 1): 
         A = XY1[I,:]
         B = XY1[I+1,:] 
 
@@ -81,8 +85,11 @@ def ICP06(XY1, XY2):
         C[1,:] = B
         distance = pdist(C)
 
+        
+        print 'distance: ', distance
         if distance > maxDist:
             XY1 = interpolatePoints(A,B, distance, maxDist, XY1)
+
 
 
     # Check the first and last points as a special case
@@ -99,6 +106,10 @@ def ICP06(XY1, XY2):
 
 
 
+
+
+    print 'Stop point B'
+    pdb.set_trace()
     # ###############
     # Do the ICP part
     # ###############
@@ -155,12 +166,19 @@ def ICP06(XY1, XY2):
 
 # THIS FUNCTION WAS CHECKED
 def interpolatePoints(A,B, distance, maxDistance, pointArray):
-    numberOfInterpolatedPoints = int(distance / maxDistance)
+
+    print pointArray
+    pdb.set_trace()
+    
+    numberOfInterpolatedPoints = int(math.floor(distance / maxDistance))
+    
     offset = (B - A)/float(numberOfInterpolatedPoints + 1)
 
     currentLocation = A
+    
     for J in range(numberOfInterpolatedPoints):
-        currentLocation += offset
+        currentLocation += offset # This line is corrupting the first location 
+                                  # of pointArray.
         pointArray = np.append(pointArray,[currentLocation], axis = 0)
     return pointArray
 
