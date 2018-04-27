@@ -10,8 +10,8 @@ def convertScanToXY(scan):
     for I in range(numberOfPoints):
         angle = (scan[I][0] * np.pi) / 180 # Convert the angle from degrees to radians
 
-        returnMatrix[I][0] = scan[I][1] * math.cos(angle)/10.0 # X = distance * cos(angle)
-        returnMatrix[I][1] = scan[I][1] * math.sin(angle)/10.0 # Y = distance * sin(angle)
+        returnMatrix[I][0] = scan[I][1] * math.cos(angle) # X = distance * cos(angle)
+        returnMatrix[I][1] = scan[I][1] * math.sin(angle)# Y = distance * sin(angle)
 
     return returnMatrix
  
