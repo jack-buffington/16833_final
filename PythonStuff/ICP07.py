@@ -182,7 +182,7 @@ def interpolatePoints(A,B, distance, maxDistance, pointArray):
     offset = (B - A)/float(numberOfInterpolatedPoints + 1)
 
     #currentLocation = A
-    currentLocation = np.array([A[0], A[1]])
+    currentLocation = np.array([ float(A[0]), float(A[1]) ])
     
     for J in range(numberOfInterpolatedPoints):
         currentLocation += offset 
@@ -248,3 +248,14 @@ def actualICP(XY1, XY2, transformationSeed):
     translation = totalTranslation;
 
     return [translation,rotationMatrix]
+
+def invertTransform(transform):
+    rotation = transform[0:2,0:2];
+    translation = transform[0:2,2];
+    rInv = rotation.T;
+    tInv = np.matmul(-rInv, translation);
+
+    invTransform=  np.array([[rInv[0,0], rInv[0,1], tInv[0]],
+                             [rInv[1,0], rInv[1,1], tInv[1]],
+                             [0,               0,         1]]);
+    return invTransform; 
