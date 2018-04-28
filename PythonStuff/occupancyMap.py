@@ -67,7 +67,7 @@ def expandMap(occupancyMap):
     occupiedPointsWorldFrame = convertMapToWorldFrame(occupiedPoints, occupancyMap);
         
     newMapSize = mapSize + offset;
-    print newMapSize
+    #print newMapSize
     newOccupancyMap = np.zeros([newMapSize, newMapSize]);
     newOccupancyMap = reInsertPoints(occupiedPointsWorldFrame, newOccupancyMap);
     return newOccupancyMap;
@@ -102,10 +102,10 @@ def visualizeMap(occupancyMap, robotPos):
     #find where in the occupancyMap is filled, return as an (x,y) 2D array 
     occMapXY = np.asarray(zip(*np.where(occupancyMap==1)));
     ax.scatter( occMapXY[:,1],occMapXY[:,0], c='b', marker='.',s=10); 
-    ax.scatter(robotPos[0]+offset, robotPos[1]+offset, c='r', marker='8');
-    plt.xlim(0,len(occupancyMap));
-    plt.ylim(0,len(occupancyMap));
-    #plt.axis('equal'); 
+    ax.scatter(robotPos[:,1]+offset, robotPos[:,0]+offset, c='r', s=5);
+    #plt.xlim(0,len(occupancyMap));
+    #plt.ylim(0,len(occupancyMap));
+    plt.axis('equal'); 
     fig.canvas.draw();
     plt.show(block=False);
 

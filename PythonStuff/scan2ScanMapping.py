@@ -26,7 +26,7 @@ lastXY = lastXY[temp] # should be just coordinates that aren't [0 0]
 
 occupancyMap = insertPoints(lastXY/10, occupancyMap)
 
-robotPos = np.array([0,0])
+robotPos = np.array([[0,0]])
 visualizeMap(occupancyMap,robotPos)
 
 # cumulativeTransform = np.matrix([[1,0,0],
@@ -61,12 +61,12 @@ for i in range(firstFrame,lastFrame,5):
 
 
     occupancyMap = insertPoints(XY/10, occupancyMap)
-    robotPos = np.array([0,0]) 
-
-    # TODO:  Update the robot pose  DO THIS LATER... 
+    thisRobotPos = np.matmul(cumulativeTransform, np.array([0,0,1]))
     
+    # Update the robot pose
+    robotPos = np.append(robotPos, [[thisRobotPos[0]/10, thisRobotPos[1]/10]], axis=0); 
     visualizeMap(occupancyMap, robotPos)
-    time.sleep(0.1)
+    #time.sleep(0.1)
     
     
 
