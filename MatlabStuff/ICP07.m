@@ -1,4 +1,4 @@
-function transformMatrix = ICP06(XY1, XY2)
+function transformMatrix = ICP07(XY1, XY2, transformationSeed)
    % This version interpolates the first point set to make matching more accurate.
    % Additionally, it is the first version that actually implements the full ICP
    % algorithm.
@@ -8,6 +8,10 @@ function transformMatrix = ICP06(XY1, XY2)
    % greater than 1.5 times maxDist from their nearest point. 
    
    % version 06 changes the output to be a homogenous transform matrix.  
+   
+   % Version 07 adds the ability to pass an initial transformation.  This allows you
+   % to simulate a motion model by passing it an initial guess about the
+   % transformation.  
    
    
    % Interpolate between points in the first scan
@@ -56,7 +60,7 @@ function transformMatrix = ICP06(XY1, XY2)
    % Do the ICP part
    % ###############
    
-   [rotationMatrix, translation] = actualICP(XY1, XY2);
+   [rotationMatrix, translation] = actualICP(XY1, XY2, transformationSeed);
    
    % rotate and translate the XY2 points
    XY2temp = XY2 * rotationMatrix';
@@ -90,7 +94,7 @@ function transformMatrix = ICP06(XY1, XY2)
    % Do ICP again with the two sets of points that match up better.
    % ##############################################################
    
-   [rotationMatrix, translation] = actualICP(XY1, XY2refined);
+   [rotationMatrix, translation] = actualICP(XY1, XY2refined, transformationSeed);
    
    
    transformMatrix = [rotationMatrix translation'; [0 0 1]]; 
@@ -99,13 +103,27 @@ end
 
 
 
-function [rotationMatrix, translation] = actualICP(XY1, XY2)
+function [rotationMatrix, translation] = actualICP(XY1, XY2, transformationSeed)
    totalTranslation = [0,0];
    totalRotationMatrix = eye(2);
    maxIterations = 50;
    errorThreshold = .00001; % This value seems to be good enough.
-   %errorThreshold = .00000001; % This value barely made a difference.
+   % errorThreshold doesn't seem to be a critical value.  Even if I make it 1/10000th
+   % of this value, it barely makes a difference though, it doesn't really raise the
+   % number if iterations much either.
+   
+   
+   % Break the transformation seed up into rotation and translation matrices.
+   rotSeed = transformationSeed(1:2,1:2);
+   transSeed = transformationSeed(1:2,3)';
+   
+   
+   % set up the initial transformation
+   XY2 = XY2 * rotSeed';
+   XY2 = XY2 + transSeed;
 
+   totalRotationMatrix = rotSeed;
+   totalTranslation = transSeed;
    
    for I = 1:maxIterations
       [rotationMatrix, translation,err] = doOneIteration(XY1,XY2);
@@ -121,7 +139,8 @@ function [rotationMatrix, translation] = actualICP(XY1, XY2)
       totalTranslation = totalTranslation * rotationMatrix' + translation;
       totalRotationMatrix = rotationMatrix * totalRotationMatrix; 
    end
-   fprintf('Iterations: %d\n',I);  
+
+   fprintf('Iterations: %d\n',I);   
    rotationMatrix = totalRotationMatrix;
    translation = totalTranslation;
 end

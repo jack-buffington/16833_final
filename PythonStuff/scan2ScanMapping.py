@@ -1,7 +1,7 @@
 from dataFileParser import *
 from convertScanToXY import *
 from occupancyMap import *
-from ICP06 import * 
+from ICP07 import * 
 import time
 import numpy as np
 import pdb
@@ -29,10 +29,12 @@ occupancyMap = insertPoints(lastXY/10, occupancyMap)
 robotPos = np.array([0,0])
 visualizeMap(occupancyMap,robotPos)
 
-cumulativeTransform = np.matrix([[1,0,0],
-                                 [0,1,0],
-                                 [0,0,1]]) 
-#pdb.set_trace();
+# cumulativeTransform = np.matrix([[1,0,0],
+#                                  [0,1,0],
+#                                  [0,0,1]]) 
+cumulativeTransform = np.eye(3)
+lastTransform = np.eye(3)
+
 
 for i in range(firstFrame,lastFrame,5): 
     XY = convertScanToXY(fileData[i])
@@ -46,7 +48,8 @@ for i in range(firstFrame,lastFrame,5):
     XY = XY[temp] # should be just coordinates that aren't [0 0]
 
 
-    thisTransform = ICP06(lastXY, XY)
+    thisTransform = ICP07(lastXY, XY, lastTransform)
+    lastTransform = thisTransform
     #pdb.set_trace();
     lastXY = XY
 
