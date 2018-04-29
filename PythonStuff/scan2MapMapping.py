@@ -37,6 +37,7 @@ for i in range(firstFrame,lastFrame,5):
 
     print '-----------------------------'
     print '-----------------------------'
+    print i 
     XY = convertScanToXY(fileData[i])
 
 
@@ -50,11 +51,10 @@ for i in range(firstFrame,lastFrame,5):
     currentRobotPos = robotPos[len(robotPos)-1];
     print 'size of occupancy map: ', occupancyMap.shape
     lastXY = getPointsWithinRadius(occupancyMap,currentRobotPos, 500);#get the points from the model around a radius of 500 cm from current robot position
-
     #****use this to visualize the model scan and the input scan 
     visualizeScan(lastXY, 1,'b');
     visualizeScan(XY, 0, 'r');
-    pdb.set_trace()
+    #pdb.set_trace()
     
     #thisTransform = ICP07( XY, lastXY , lastTransform)
     thisTransform = ICP08(lastXY, XY , lastTransform)

@@ -30,6 +30,7 @@ def convertMapToWorldFrame(points, occupancyMap):  # Converts the points into wo
 
 
 def getPointsWithinRadius(occupancyMap, robotPose, radius):
+    #pdb.set_trace()
     #radius in centimetres.
     #robot pose in world Coordinates, radians
     mapSize = len(occupancyMap);
@@ -75,8 +76,11 @@ def getPointsWithinRadius(occupancyMap, robotPose, radius):
         x = validSection[i,0];
         y = validSection[i,1];
         #points which are within the reqd range have the index set to 1 in valid indices
-        if ( x>=xMin & x<=xMax & y>=yMin & y<=yMax):
+        #print (x,y)
+        if ( x>=xMin and x<=xMax and y>=yMin and y<=yMax):
+           # print 'within range'
             validIndices[i] = 1;
+    #pdb.set_trace()
     validIndices = np.where(validIndices==1); # indices for validSelection that should be used
     mapSectionXY = validSection[validIndices];
 
@@ -93,7 +97,7 @@ def getPointsWithinRadius(occupancyMap, robotPose, radius):
     print 'Size of the map section: ', mapSectionXY.shape
     print 'Size of the rotation Matrix: ', rotationMatrix.shape
 
-    mapSectionXY = np.matmul(mapSectionXY, rotationMatrix) # Remove the rotation
+    mapSectionXY = np.matmul(mapSectionXY, rotationMatrix.T) # Remove the rotation
     return (mapSectionXY*10.0); 
     
 
