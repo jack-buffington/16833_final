@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 import pdb
+import math
 
 
 def initMap():
@@ -78,8 +79,21 @@ def getPointsWithinRadius(occupancyMap, robotPose, radius):
             validIndices[i] = 1;
     validIndices = np.where(validIndices==1); # indices for validSelection that should be used
     mapSectionXY = validSection[validIndices];
-    mapSectionXY = convertMapToWorldFrame(mapSectionXY, occupancyMap);
-    #return 2D array of map points within the radius in world coordinates 
+
+    # Remove the offset to get things into world frame coordinates
+    mapSectionXY = convertMapToWorldFrame(mapSectionXY, occupancyMap); 
+
+
+    # Convert the coordinates over to robot frame coordinates  (Where the robot is at 0,0 and facing 0 radians)
+    mapSectionXY = mapSectionXY.astype(float)
+    mapSectionXY -= robotPose[0:2]  # Remove the translation
+    rotationMatrix = np.array([[math.cos(robotPose[2]), -math.sin(robotPose[2])],[math.sin(robotPose[2]), math.cos(robotPose[2])]])
+
+    print 'robot pose: ', robotPose[0], ', ', robotPose[1], ', ', robotPose[2]
+    print 'Size of the map section: ', mapSectionXY.shape
+    print 'Size of the rotation Matrix: ', rotationMatrix.shape
+
+    mapSectionXY = np.matmul(mapSectionXY, rotationMatrix) # Remove the rotation
     return (mapSectionXY*10.0); 
     
 
