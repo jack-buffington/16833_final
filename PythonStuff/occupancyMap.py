@@ -15,7 +15,8 @@ def convertWorldFrameToMap(points, occupancyMap):
     points = points.astype('int'); 
     return points;
 
-def convertMapToWorldFrame(points, occupancyMap):
+
+def convertMapToWorldFrame(points, occupancyMap):  # Converts the points into world coordinates
     offset = len(occupancyMap)/2;
     points = (points) - offset;
     return points;
@@ -31,7 +32,7 @@ def getPointsWithinRadius(occupancyMap, robotPose, radius):
     #radius in centimetres.
     #robot pose in world Coordinates, radians
     mapSize = len(occupancyMap);
-    offset = mapSize/2;
+    offset = mapSize/2;             # This is the location of zero in the map
     robotX = robotPose[0]+offset;
     robotY = robotPose[1]+offset;
     
@@ -51,19 +52,31 @@ def getPointsWithinRadius(occupancyMap, robotPose, radius):
     if (yMax >= mapSize):
         yMax = mapSize-1;
 
-    xMin = int(xMin);
+    xMin = int(xMin);   # These are the the coordinates within the map
     xMax = int(xMax);
     yMin = int(yMin);
-    yMax = int(yMax);
+    yMax = int(yMax); 
+
     validSection = np.asarray(zip(*np.where(occupancyMap==1))); #get occupied indicies in occupancy map
-    validIndices = np.zeros((len(validSection))); 
+    # validSection looks like this, where each row is the coordinate for a map location that was a 1
+    # array([[0, 2],
+    #        [0, 4],
+    #        [0, 5],
+    #        [1, 0],
+    #        [1, 1],
+    #        [1, 3],
+    #        [1, 5]])
+
+
+    validIndices = np.zeros((len(validSection)));  # this is a vector of 1's and 0's representing which
+                                                   # points should be used
     for i in range(len(validSection)):
         x = validSection[i,0];
         y = validSection[i,1];
         #points which are within the reqd range have the index set to 1 in valid indices
         if ( x>=xMin & x<=xMax & y>=yMin & y<=yMax):
             validIndices[i] = 1;
-    validIndices = np.where(validIndices==1);
+    validIndices = np.where(validIndices==1); # indices for validSelection that should be used
     mapSectionXY = validSection[validIndices];
     mapSectionXY = convertMapToWorldFrame(mapSectionXY, occupancyMap);
     #return 2D array of map points within the radius in world coordinates 
