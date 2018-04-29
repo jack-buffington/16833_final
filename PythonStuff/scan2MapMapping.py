@@ -1,7 +1,7 @@
 from dataFileParser import *
 from convertScanToXY import *
 from occupancyMap import *
-from ICP07 import * 
+from ICP08 import * 
 import time
 import numpy as np
 import pdb
@@ -23,7 +23,7 @@ temp = np.sum(temp, axis = 1) < 2 # should be true and false correspoinding
                                   # to rows that we want to keep (True)
 
 occupancyMap = insertPoints(lastXY/10, occupancyMap)
-robotPos = np.array([[0,0]])
+robotPos = np.array([[0,0,0]])
 visualizeMap(occupancyMap,robotPos)
 
 # cumulativeTransform = np.matrix([[1,0,0],
@@ -52,21 +52,25 @@ for i in range(firstFrame,lastFrame,5):
     #visualizeScan(XY, 0, 'r');
     #pdb.set_trace()
     
-    thisTransform = ICP07( XY, lastXY , lastTransform)
+    #thisTransform = ICP07( XY, lastXY , lastTransform)
+    thisTransform = ICP08(lastXY, XY , lastTransform)
+
     lastTransform = thisTransform;
-    thisTransformInv = invertTransform(thisTransform);
-    cumulativeTransform = np.matmul(cumulativeTransform,thisTransformInv);
+    #thisTransformInv = invertTransform(thisTransform);
+    #cumulativeTransform = np.matmul(cumulativeTransform,thisTransformInv);
+    cumulativeTransform = np.matmul(cumulativeTransform,thisTransform);
     
     # Plot the transformed points
     XY = np.append(XY,np.ones([len(XY),1]), axis=1)
     XY = np.matmul( XY, cumulativeTransform.T)
-    print '************************** ', i
-    print XY
-    pdb.set_trace(); 
+    #print '************************** ', i
+    #print XY
+    #pdb.set_trace(); 
     occupancyMap = insertPoints(XY/10, occupancyMap)
     thisRobotPos = np.matmul(cumulativeTransform, np.array([0,0,1]))
     
     # Update the robot pose
-    robotPos = np.append(robotPos, [[thisRobotPos[0]/10, thisRobotPos[1]/10]], axis=0); 
+    robotAngle = math.atan2(cumulativeTransform[1,0], cumulativeTransform[0,0])
+    robotPos = np.append(robotPos, [[thisRobotPos[0]/10, thisRobotPos[1]/10, robotAngle]], axis=0) 
     visualizeMap(occupancyMap, robotPos)
     #time.sleep(0.1)

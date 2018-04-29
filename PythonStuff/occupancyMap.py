@@ -20,9 +20,16 @@ def convertMapToWorldFrame(points, occupancyMap):
     points = (points) - offset;
     return points;
    
+
+
+
+
+
+
+
 def getPointsWithinRadius(occupancyMap, robotPose, radius):
     #radius in centimetres.
-    #robot pose in world Coordinates
+    #robot pose in world Coordinates, radians
     mapSize = len(occupancyMap);
     offset = mapSize/2;
     robotX = robotPose[0]+offset;
@@ -62,6 +69,11 @@ def getPointsWithinRadius(occupancyMap, robotPose, radius):
     #return 2D array of map points within the radius in world coordinates 
     return (mapSectionXY*10.0); 
     
+
+
+
+
+
 
 
 def reInsertPoints(pointsWorldFrame, occupancyMap):
