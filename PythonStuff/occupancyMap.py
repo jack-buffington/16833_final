@@ -4,15 +4,21 @@ from PIL import Image
 import pdb
 import math
 
+def invertTransform(transform):
+    rotation = transform[0:2,0:2];
+    translation = transform[0:2,2];
+    rInv = rotation.T;
+    tInv = np.matmul(-rInv, translation);
+
+    invTransform=  np.array([[rInv[0,0], rInv[0,1], tInv[0]],
+                             [rInv[1,0], rInv[1,1], tInv[1]],
+                             [0,               0,         1]]);
+    return invTransform;
 
 def initMap():
     #scale 1 unit = 1cm = 0.01m 
     occupancyMap = np.zeros([100,100],dtype=int);
     return occupancyMap;
-
-
-
-
 
 def convertWorldFrameToMap(points, occupancyMap):
     offset = len(occupancyMap)/2;
@@ -20,24 +26,12 @@ def convertWorldFrameToMap(points, occupancyMap):
     points = points.astype('int'); 
     return points;
 
-
-
-
-
-
 def convertMapToWorldFrame(points, occupancyMap):  # Converts the points into world coordinates
     offset = len(occupancyMap)/2;
     points = (points) - offset;
     return points;
-   
 
-
-
-
-
-
-
-def getPointsWithinRadius(occupancyMap, robotPose, radius):
+def getPointsWithinRadius(occupancyMap, robotPose, radius, transform):
     #pdb.set_trace()
     #radius in centimetres.
     #robot pose in world Coordinates, radians
@@ -93,29 +87,23 @@ def getPointsWithinRadius(occupancyMap, robotPose, radius):
     mapSectionXY = validSection[validIndices];
 
     # Remove the offset to get things into world frame coordinates
-    mapSectionXY = convertMapToWorldFrame(mapSectionXY, occupancyMap); 
-
-
+    
+    mapSectionXY = convertMapToWorldFrame(mapSectionXY, occupancyMap);
+    #pdb.set_trace()
+    mapSectionXY = mapSectionXY*10.0; 
+    mapSectionXY = np.append(mapSectionXY,np.ones([len(mapSectionXY),1]), axis=1)
     # Convert the coordinates over to robot frame coordinates  (Where the robot is at 0,0 and facing 0 radians)
-    mapSectionXY = mapSectionXY.astype(float)
-    mapSectionXY -= robotPose[0:2]  # Remove the translation
-    rotationMatrix = np.array([[math.cos(robotPose[2]), -math.sin(robotPose[2])],[math.sin(robotPose[2]), math.cos(robotPose[2])]])
-
-    print 'robot pose: ', robotPose[0], ', ', robotPose[1], ', ', robotPose[2]
-    print 'Size of the map section: ', mapSectionXY.shape
-    print 'Number of points in the map: ', validSection.shape[0]
-    print 'Size of the rotation Matrix: ', rotationMatrix.shape
+    
+    invTransform = invertTransform(transform); 
+    mapSectionXY = np.matmul(invTransform, mapSectionXY.T); 
+    mapSectionXY = mapSectionXY.T
+    #print 'robot pose: ', robotPose[0], ', ', robotPose[1], ', ', robotPose[2]
+    #print 'Size of the map section: ', mapSectionXY.shape
+    #print 'Number of points in the map: ', validSection.shape[0]
+    #print 'Size of the rotation Matrix: ', rotationMatrix.shape
     #pdb.set_trace()
 
-    mapSectionXY = np.matmul(mapSectionXY, rotationMatrix) # Remove the rotation
-    return (mapSectionXY*10.0); 
-    
-
-
-
-
-
-
+    return (mapSectionXY[:,0:2]); 
 
 def reInsertPoints(pointsWorldFrame, occupancyMap):
     #print 'reinserting points \n'
@@ -124,10 +112,6 @@ def reInsertPoints(pointsWorldFrame, occupancyMap):
     if(len(pointsMap) > 0):
         occupancyMap[pointsMap[:,0], pointsMap[:,1]] = int(1);
     return occupancyMap;
-
-
-
-
 
 def expandMap(occupancyMap):
     offset = 200; 
@@ -143,10 +127,6 @@ def expandMap(occupancyMap):
     newOccupancyMap = reInsertPoints(occupiedPointsWorldFrame, newOccupancyMap);
     return newOccupancyMap;
 
-
-
-
-
 def withinMap(points, occupancyMap):
     #print 'in withinMap function'
     mapSize = len(occupancyMap);
@@ -157,11 +137,6 @@ def withinMap(points, occupancyMap):
     else:
         return False; 
 
-
-
-
-
-    
 def insertPoints(pointsWorldFrame, occupancyMap):
     #points -> 2d array of points in world frame
     #print 'Inserting new points'
@@ -172,9 +147,6 @@ def insertPoints(pointsWorldFrame, occupancyMap):
     
     occupancyMap[pointsMapFrame[:,0], pointsMapFrame[:,1]] = int(1);
     return occupancyMap;
-
-
-
 
 
 def visualizeMap(occupancyMap, robotPos):
@@ -193,11 +165,6 @@ def visualizeMap(occupancyMap, robotPos):
     plt.axis('equal'); 
     fig.canvas.draw();
     plt.show(block=False);
-
-
-
-
-
 
 def visualizeScan(points, clearFlag,color):
     fig = plt.figure(2);
