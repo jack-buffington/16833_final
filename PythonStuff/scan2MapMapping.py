@@ -10,7 +10,7 @@ import pdb
 
 fileData = loadData('firstFloor.txt')
 
-insertionDistance = 500
+insertionDistance = 250
 visualizationDivider = 5; # only show every 5th frame.
 
 firstFrame = 90 - 1
@@ -106,8 +106,8 @@ for i in range(firstFrame,lastFrame,1):
     robotAngle = math.atan2(cumulativeTransform[1,0], cumulativeTransform[0,0])
     robotPos = np.append(robotPos, [[thisRobotPos[0]/10, thisRobotPos[1]/10, robotAngle]], axis=0) 
     
-    count = count + 1
-    if count % visualizationDivider == 0:
-        visualizeMap(occupancyMap, robotPos)
+    # count = count + 1
+    # if count % visualizationDivider == 0:
+    visualizeMap(occupancyMap, robotPos)
 
 pdb.set_trace()  # make it pause so we can see the entire map.
