@@ -50,7 +50,7 @@ for i in range(firstFrame,lastFrame,5):
 
     currentRobotPos = robotPos[len(robotPos)-1];
     print 'size of occupancy map: ', occupancyMap.shape
-    lastXY = getPointsWithinRadius(occupancyMap,currentRobotPos, 500);#get the points from the model around a radius of 500 cm from current robot position
+    lastXY = getPointsWithinRadius(occupancyMap,currentRobotPos, 1200);#get the points from the model around a radius of 500 cm from current robot position
     #****use this to visualize the model scan and the input scan 
     visualizeScan(lastXY, 1,'b');
     visualizeScan(XY, 0, 'r');
@@ -80,3 +80,4 @@ for i in range(firstFrame,lastFrame,5):
     robotPos = np.append(robotPos, [[thisRobotPos[0]/10, thisRobotPos[1]/10, robotAngle]], axis=0) 
     visualizeMap(occupancyMap, robotPos)
     #time.sleep(0.1)
+pdb.set_trace()  # make it pause so we can see the entire map.
