@@ -103,7 +103,9 @@ def getPointsWithinRadius(occupancyMap, robotPose, radius):
 
     print 'robot pose: ', robotPose[0], ', ', robotPose[1], ', ', robotPose[2]
     print 'Size of the map section: ', mapSectionXY.shape
+    print 'Number of points in the map: ', validSection.shape[0]
     print 'Size of the rotation Matrix: ', rotationMatrix.shape
+    #pdb.set_trace()
 
     mapSectionXY = np.matmul(mapSectionXY, rotationMatrix) # Remove the rotation
     return (mapSectionXY*10.0); 
@@ -184,7 +186,7 @@ def visualizeMap(occupancyMap, robotPos):
     #find where in the occupancyMap is filled, return as an (x,y) 2D array 
     occMapXY = np.asarray(zip(*np.where(occupancyMap==1)));
     #ax.scatter( occMapXY[:,1],occMapXY[:,0], c='b', marker='.',s=10); 
-    ax.scatter( occMapXY[:,1],occMapXY[:,0], c='b', marker=',',s=10); 
+    ax.scatter( occMapXY[:,1],occMapXY[:,0], c='b', marker='.',s=20, linewidth='0'); 
     ax.scatter(robotPos[:,1]+offset, robotPos[:,0]+offset, c='r', s=5);
     #plt.xlim(0,len(occupancyMap));
     #plt.ylim(0,len(occupancyMap));

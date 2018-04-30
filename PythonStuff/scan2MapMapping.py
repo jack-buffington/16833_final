@@ -10,6 +10,9 @@ import pdb
 
 fileData = loadData('firstFloor.txt')
 
+insertionDistance = 500
+visualizationDivider = 5; # only show every 5th frame.
+
 firstFrame = 90 - 1
 lastFrame = len(fileData) - 1
 
@@ -23,6 +26,10 @@ temp = np.sum(temp, axis = 1) < 2 # should be true and false correspoinding
                                   # to rows that we want to keep (True)
 
 occupancyMap = insertPoints(lastXY/10, occupancyMap)
+lastInsertionPosition = np.array([0,0]) 
+lastInsertionAngle = 0; # radians
+
+
 robotPos = np.array([[0,0,0]])
 visualizeMap(occupancyMap,robotPos)
 
@@ -32,8 +39,10 @@ visualizeMap(occupancyMap,robotPos)
 cumulativeTransform = np.eye(3)
 lastTransform = np.eye(3)
 
+C = np.zeros([2,2])  # this is necessary in Python to use pdist
 
-for i in range(firstFrame,lastFrame,5): 
+count = 1
+for i in range(firstFrame,lastFrame,1): 
 
     print '-----------------------------'
     print '-----------------------------'
@@ -62,22 +71,43 @@ for i in range(firstFrame,lastFrame,5):
     print 'thisTransform'
     print thisTransform
     lastTransform = thisTransform;
-    #thisTransformInv = invertTransform(thisTransform);
-    #cumulativeTransform = np.matmul(cumulativeTransform,thisTransformInv);
+
     cumulativeTransform = np.matmul(cumulativeTransform,thisTransform);
     
     # Plot the transformed points
     XY = np.append(XY,np.ones([len(XY),1]), axis=1)
     XY = np.matmul( XY, cumulativeTransform.T)
-    #print '************************** ', i
-    #print XY
-    #pdb.set_trace(); 
-    occupancyMap = insertPoints(XY/10, occupancyMap)
+
+
+    # Figure out what the current pose is and determine if it should insert the points or not
+    # OPTION 1:  JUST SPACE OUT HOW FAR IT CAN GO BEFORE POINTS ARE ADDED IN.
+    # OPTION 2:  KEEP TRACK OF WHERE POINTS WERE ADDED IN AND ONLY PUT THEM IN IF IT IS FARTHER THAN 
+    #          SOME PREDETERMINED DISTANCE
+    # OPTION 3: ONLY ADD IN POINTS THAT DON'T HAVE ANOTHER POINT ALREADY IN THE MAP THAT IS CLOSE TO THEM
+
+    thisPosition = np.array([cumulativeTransform[0,2], cumulativeTransform[1,2]])
+    thisAngle = math.atan2(cumulativeTransform[1,0], cumulativeTransform[0,0])
+
+    # Find the distance between this pose and the last one inserted
+    #delta = thisPosition - lastInsertionPosition
+    C[0,:] = thisPosition           # and is used to find the distance betwen them
+    C[1,:] = lastInsertionPosition
+    distance = pdist(C)
+    print 'distance: ', distance
+
+    if distance > insertionDistance:
+        occupancyMap = insertPoints(XY/10, occupancyMap)
+        lastInsertionPosition = thisPosition
+        lastInsertionAngle = thisAngle
+
     thisRobotPos = np.matmul(cumulativeTransform, np.array([0,0,1]))
     
     # Update the robot pose
     robotAngle = math.atan2(cumulativeTransform[1,0], cumulativeTransform[0,0])
     robotPos = np.append(robotPos, [[thisRobotPos[0]/10, thisRobotPos[1]/10, robotAngle]], axis=0) 
-    visualizeMap(occupancyMap, robotPos)
-    #time.sleep(0.1)
+    
+    count = count + 1
+    if count % visualizationDivider == 0:
+        visualizeMap(occupancyMap, robotPos)
+
 pdb.set_trace()  # make it pause so we can see the entire map.
